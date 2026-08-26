@@ -8,6 +8,24 @@ import {
   charForCell
 } from "./countries.js";
 import { chimes } from "./chimes.js";
+import { getGuide } from "./guides.js";
+import { deliverySrc } from "./media.js";
+import {
+  communityFromPending,
+  fetchArticle,
+  fetchPublishedArticles,
+  getPublishedCache,
+  hydrateSession,
+  listPublishedCommunity
+} from "./wiki-api.js";
+import { mergeSeedAndOverlay, slugify } from "./wiki-merge.js";
+import {
+  initWikiUi,
+  renderAdminList,
+  bindAdminList,
+  closeWikiSheets,
+  syncRoleChrome
+} from "./wiki-ui.js";
 
 /* Loaded on demand so a missing/broken contributions.js cannot kill About + home. */
 let contribApi = null;
@@ -59,6 +77,7 @@ const DEFAULT_GRID_W = 36;
 const DEFAULT_GRID_H = 40;
 
 let currentCountryId = DEFAULT_COUNTRY;
+let currentGuideSlug = DEFAULT_COUNTRY;
 let transitioning = false;
 let countryBinding = null;
 let gridWBinding = null;
@@ -123,6 +142,10 @@ function applyCountryCopy(country) {
     }
   }
   document.title = `Budarina — ${country.name}`;
+  currentGuideSlug = country.id;
+  if (document.getElementById("stage")?.dataset.view === "guide") {
+    renderGuide(country.id);
+  }
   requestAnimationFrame(() => layoutAreaAboveCopy());
 }
 
@@ -263,7 +286,10 @@ async function transitionTo(id, direction) {
 
 function setCountry(id, opts = {}) {
   if (!COUNTRIES[id]) return;
-  if (opts.animate === false || id === currentCountryId) {
+  const reduce =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (opts.animate === false || reduce || id === currentCountryId) {
     setCountryImmediate(id);
     return;
   }
@@ -274,7 +300,7 @@ function setCountry(id, opts = {}) {
   if (direction == null) {
     if (from < 0 || to < 0) direction = 1;
     else {
-      const n = 3;
+      const n = COUNTRY_ORDER.length;
       const forward = (to - from + n) % n;
       const backward = (from - to + n) % n;
       direction = forward <= backward ? 1 : -1;
@@ -450,6 +476,28 @@ function isAboutOpen() {
   return !!(aboutModal && !aboutModal.hidden);
 }
 
+function aboutFocusables() {
+  if (!aboutModal) return [];
+  return [...aboutModal.querySelectorAll("a[href], button, input, textarea, select, [tabindex]:not([tabindex='-1'])")].filter(
+    (el) => !el.disabled && el.offsetParent !== null
+  );
+}
+
+function onAboutFocusTrap(e) {
+  if (!isAboutOpen() || e.key !== "Tab") return;
+  const nodes = aboutFocusables();
+  if (!nodes.length) return;
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 function mountModal(el) {
   if (el && el.parentElement !== document.body) {
     document.body.appendChild(el);
@@ -475,9 +523,11 @@ function setAboutOpen(open) {
     aboutModal.removeAttribute("hidden");
     aboutModal.setAttribute("aria-hidden", "false");
     aboutBtn?.setAttribute("aria-expanded", "true");
+    aboutModal.addEventListener("keydown", onAboutFocusTrap);
     const closeBtn = document.getElementById("aboutClose");
     (closeBtn || aboutModal).focus?.();
   } else {
+    aboutModal.removeEventListener("keydown", onAboutFocusTrap);
     aboutModal.hidden = true;
     aboutModal.setAttribute("hidden", "");
     aboutModal.setAttribute("aria-hidden", "true");
@@ -655,6 +705,19 @@ window.addEventListener("keydown", (e) => {
       return;
     }
     setPaneOpen(false);
+    return;
+  }
+  if (
+    (e.key === "ArrowLeft" || e.key === "ArrowRight") &&
+    document.getElementById("stage")?.dataset.view === "home" &&
+    !e.target?.closest?.("input, textarea, select, [contenteditable='true']")
+  ) {
+    e.preventDefault();
+    const btnId = e.key === "ArrowLeft" ? "btnLeft" : "btnRight";
+    const id = document.getElementById(btnId)?.dataset.country;
+    if (id) {
+      setCountry(id, { direction: e.key === "ArrowLeft" ? -1 : 1 });
+    }
   }
 });
 
@@ -667,6 +730,9 @@ function isPaneEvent(e) {
     e.target?.closest?.(".about") ||
     e.target?.closest?.(".about-btn") ||
     e.target?.closest?.(".contributions") ||
+    e.target?.closest?.(".guide") ||
+    e.target?.closest?.(".admin") ||
+    e.target?.closest?.(".wiki-sheet") ||
     e.target?.closest?.(".aside-block")
   );
 }
@@ -816,6 +882,11 @@ function main() {
   let lastDelta = performance.now();
   function runloop(delta) {
     rafID = requestAnimationFrame(runloop);
+    const view = document.getElementById("stage")?.dataset.view;
+    if (view && view !== "home") {
+      lastDelta = delta;
+      return;
+    }
     const dt = Math.min(32, Math.max(1, delta - lastDelta));
     lastDelta = delta;
 
@@ -1104,15 +1175,276 @@ class Constraint {
   }
 }
 
-/* ─── Views: Home ↔ Destinations ↔ Contributions ─── */
+function articleFor(slug) {
+  const id = slug || currentGuideSlug || currentCountryId;
+  if (COUNTRIES[id]) {
+    const country = COUNTRIES[id];
+    const guide = getGuide(country.id);
+    const cached = getPublishedCache(country.id);
+    if (cached?.sections?.length) {
+      return {
+        slug: country.id,
+        name: country.name,
+        typology: cached.typology || guide.typology,
+        setting: cached.setting || guide.setting,
+        lead: cached.lead || guide.lead,
+        sections: cached.sections,
+        related: cached.related || guide.related || [],
+        sources: cached.sources || []
+      };
+    }
+    const merged = mergeSeedAndOverlay(guide, cached);
+    return {
+      slug: country.id,
+      name: country.name,
+      typology: merged.typology,
+      setting: merged.setting,
+      lead: merged.lead,
+      sections: merged.sections || [],
+      related: merged.related || [],
+      sources: merged.sources || []
+    };
+  }
+  const live = getPublishedCache(id);
+  if (live) {
+    return {
+      slug: live.slug || id,
+      name: live.name || live.title || id,
+      typology: live.typology || "Community page",
+      setting: live.setting || "",
+      lead: live.lead || "",
+      sections: live.sections || [],
+      related: live.related || [],
+      sources: live.sources || []
+    };
+  }
+  const row = communityFromPending().find(
+    (r) => slugify(r.title) === id || r.targetSlug === id
+  );
+  if (!row) {
+    return {
+      slug: id,
+      name: id,
+      missing: true,
+      typology: "",
+      setting: "",
+      lead: "",
+      sections: [],
+      related: [],
+      sources: []
+    };
+  }
+  const fig = row.imageUrl
+    ? {
+        side: "left",
+        src: row.imageUrl,
+        alt: row.title || "",
+        caption: row.typology || ""
+      }
+    : null;
+  return {
+    slug: id,
+    name: row.title || id,
+    typology: row.typology || "Community page",
+    setting: row.setting || "Queued or published by a contributor",
+    lead: row.lead || "",
+    sections: row.sectionBody
+      ? [
+          {
+            heading: row.sectionHeading || "Note",
+            paragraphs: [row.sectionBody],
+            figure: fig
+          }
+        ]
+      : [],
+    related: []
+  };
+}
+
+function pageLoading(slug) {
+  const page = document.getElementById("guidePage");
+  if (!page) return;
+  page.innerHTML = `
+    <header class="guide__hero">
+      <p class="guide__typology">Guide</p>
+      <h2 class="guide__title">Looking up ${escapeHtml(slug)}</h2>
+      <p class="guide__lead">Fetching the published page.</p>
+    </header>
+  `;
+}
+
+function renderGuide(id) {
+  const page = document.getElementById("guidePage");
+  if (!page) return;
+  const slug = id || currentGuideSlug || currentCountryId;
+  currentGuideSlug = slug;
+  const article = articleFor(slug);
+  if (article.missing) {
+    page.innerHTML = `
+      <header class="guide__hero">
+        <p class="guide__typology">Guide</p>
+        <h2 class="guide__title">No page for ${escapeHtml(article.slug)}</h2>
+        <p class="guide__lead">That slug is not in the seed essays or the published wiki. You can add it, or search the index.</p>
+        <nav class="guide__tools" aria-label="Guide tools">
+          <button type="button" class="about-btn" data-wiki="add-page" data-title="${escapeHtml(article.slug)}">Add a page</button>
+          <button type="button" class="about-btn" id="accountBtn" data-wiki="account">Account</button>
+          <a class="about-btn" href="#guide/${DEFAULT_COUNTRY}" data-guide-country="${DEFAULT_COUNTRY}">Open China</a>
+        </nav>
+      </header>
+    `;
+    document.title = "Chimes — Not found";
+    return;
+  }
+  const index = COUNTRY_ORDER.map((cid) => {
+    const c = COUNTRIES[cid];
+    const currentCls = cid === article.slug ? "is-current" : "";
+    return `<li><a href="#guide/${cid}" class="${currentCls}" data-guide-country="${cid}">${escapeHtml(c.name)}</a></li>`;
+  }).join("");
+  const seen = new Set(COUNTRY_ORDER);
+  const extraRows = [
+    ...listPublishedCommunity(),
+    ...communityFromPending().map((row) => ({
+      slug: slugify(row.title) || row.targetSlug,
+      title: row.title
+    }))
+  ];
+  const extra = extraRows
+    .map((row) => {
+      const sid = row.slug || slugify(row.title);
+      if (!sid || seen.has(sid) || COUNTRIES[sid]) return "";
+      seen.add(sid);
+      const currentCls = sid === article.slug ? "is-current" : "";
+      return `<li><a href="#guide/${escapeHtml(sid)}" class="${currentCls}" data-guide-article="${escapeHtml(sid)}">${escapeHtml(row.title || row.name || sid)}</a></li>`;
+    })
+    .join("");
+
+  const sections = (article.sections || [])
+    .map((section) => {
+      let figure = "";
+      if (section.figure) {
+        const side = section.figure.side === "right" ? "right" : "left";
+        const src = deliverySrc(section.figure.src);
+        figure = `<figure class="guide__figure guide__figure--${side}">
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(section.figure.alt || "")}" loading="lazy" />
+          <figcaption>${escapeHtml(section.figure.caption || "")}</figcaption>
+        </figure>`;
+      }
+      const paras = (section.paragraphs || [])
+        .map((p) => `<p>${escapeHtml(p)}</p>`)
+        .join("");
+      return `<section class="guide__section">
+        <h3 class="guide__heading">${escapeHtml(section.heading)}</h3>
+        ${figure}
+        ${paras}
+      </section>`;
+    })
+    .join("");
+
+  const related = (article.related || [])
+    .map((cid) => {
+      const c = COUNTRIES[cid];
+      if (!c) return "";
+      return `<a class="guide__related" href="#guide/${cid}" data-guide-country="${cid}">${escapeHtml(c.name)}</a>`;
+    })
+    .join("");
+  const sources = (article.sources || [])
+    .filter((s) => s && (s.title || s.url))
+    .map((s) => {
+      const label = escapeHtml(s.title || s.url);
+      if (s.url) {
+        return `<a class="guide__related" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      }
+      return `<span class="guide__related">${label}</span>`;
+    })
+    .join("");
+
+  page.innerHTML = `
+    <header class="guide__hero">
+      <p class="guide__typology">${escapeHtml(article.typology || "")}</p>
+      <h2 class="guide__title">${escapeHtml(article.name)}</h2>
+      <p class="guide__setting">${escapeHtml(article.setting || "")}</p>
+      <p class="guide__lead">${escapeHtml(article.lead || "")}</p>
+      <nav class="guide__tools" aria-label="Guide tools">
+        <button type="button" class="about-btn" id="askBtn" data-wiki="ask" aria-expanded="false">Ask</button>
+        <button type="button" class="about-btn" data-wiki="improve">Improve</button>
+        <button type="button" class="about-btn" data-wiki="add-page">Add a page</button>
+        <button type="button" class="about-btn" data-wiki="add-roof">Add a roof</button>
+        <button type="button" class="about-btn" id="accountBtn" data-wiki="account" aria-expanded="false">Account</button>
+      </nav>
+      <label class="visually-hidden" for="guideSearch">Search pages</label>
+      <input class="wiki-input guide__search" id="guideSearch" type="search" placeholder="Search pages" autocomplete="off" />
+      <ul class="guide__index">${index}${extra}</ul>
+    </header>
+    ${sections}
+    <footer class="guide__footer">
+      ${related}
+      ${sources}
+      <a class="guide__home" href="#home" data-view="home">Back to the curtain</a>
+    </footer>
+  `;
+  document.title = `Chimes — ${article.name}`;
+}
+
+function initGuide() {
+  const view = document.getElementById("guideView");
+  if (!view) return;
+  view.addEventListener("click", (e) => {
+    const countryLink = e.target.closest?.("[data-guide-country]");
+    if (countryLink) {
+      e.preventDefault();
+      const id = countryLink.dataset.guideCountry;
+      currentGuideSlug = id;
+      if (id && COUNTRIES[id]) setCountry(id, { animate: false });
+      else renderGuide(id);
+      view.scrollTo(0, 0);
+      return;
+    }
+    const articleLink = e.target.closest?.("[data-guide-article]");
+    if (articleLink) {
+      e.preventDefault();
+      const id = articleLink.dataset.guideArticle;
+      currentGuideSlug = id;
+      pageLoading(id);
+      fetchArticle(id).then(() => renderGuide(id));
+      view.scrollTo(0, 0);
+      history.replaceState(null, "", `#guide/${id}`);
+      return;
+    }
+    if (e.target?.id === "guideSearch") return;
+    const homeLink = e.target.closest?.('a[data-view="home"]');
+    if (homeLink) {
+      e.preventDefault();
+      window.setView?.("home");
+    }
+  });
+  view.addEventListener("input", (e) => {
+    if (e.target?.id !== "guideSearch") return;
+    const q = String(e.target.value || "").toLowerCase().trim();
+    view.querySelectorAll(".guide__index li").forEach((li) => {
+      const text = li.textContent.toLowerCase();
+      li.hidden = Boolean(q) && !text.includes(q);
+    });
+  });
+}
+
+/* ─── Views: Home ↔ Destinations ↔ Guide ↔ Contributions ─── */
 function initViews() {
   const stage = document.getElementById("stage");
   const destView = document.getElementById("destinationsView");
   const contribView = document.getElementById("contributionsView");
+  const guideView = document.getElementById("guideView");
+  const adminView = document.getElementById("adminView");
   const links = document.querySelectorAll("a[data-view]");
 
   function normalizeView(view) {
-    if (view === "destinations" || view === "contributions") return view;
+    if (
+      view === "destinations" ||
+      view === "contributions" ||
+      view === "guide" ||
+      view === "admin"
+    ) {
+      return view;
+    }
     return "home";
   }
 
@@ -1134,6 +1466,8 @@ function initViews() {
     stage.dataset.view = next;
     if (destView) destView.hidden = next !== "destinations";
     if (contribView) contribView.hidden = next !== "contributions";
+    if (guideView) guideView.hidden = next !== "guide";
+    if (adminView) adminView.hidden = next !== "admin";
     links.forEach((a) => {
       a.classList.toggle("is-active", a.dataset.view === next);
     });
@@ -1148,8 +1482,27 @@ function initViews() {
       enterContributionsView();
     }
 
+    if (next === "guide") {
+      if (isAboutOpen()) setAboutOpen(false);
+      closeWikiSheets();
+      const slug = currentGuideSlug || currentCountryId;
+      renderGuide(slug);
+      fetchArticle(slug).then((article) => {
+        if (article) renderGuide(slug);
+      });
+      guideView?.scrollTo(0, 0);
+    }
+
+    if (next === "admin") {
+      if (isAboutOpen()) setAboutOpen(false);
+      closeWikiSheets();
+      renderAdminList();
+      document.title = "Chimes — Inbox";
+    }
+
     layoutAreaAboveCopy();
-    const hash = next === "home" ? "#home" : `#${next}`;
+    let hash = next === "home" ? "#home" : `#${next}`;
+    if (next === "guide") hash = `#guide/${currentGuideSlug || currentCountryId}`;
     if (location.hash !== hash) {
       history.replaceState(null, "", hash);
     }
@@ -1165,12 +1518,21 @@ function initViews() {
     });
   });
 
+  const rawHash = location.hash || "";
+  if (rawHash.startsWith("#guide/")) {
+    currentGuideSlug = rawHash.slice(7) || DEFAULT_COUNTRY;
+    if (COUNTRIES[currentGuideSlug]) currentCountryId = currentGuideSlug;
+  }
   const initial = normalizeView(
-    location.hash === "#destinations"
-      ? "destinations"
-      : location.hash === "#contributions"
-        ? "contributions"
-        : "home"
+    rawHash.startsWith("#guide")
+      ? "guide"
+      : rawHash === "#destinations"
+        ? "destinations"
+        : rawHash === "#contributions"
+          ? "contributions"
+          : rawHash === "#admin"
+            ? "admin"
+            : "home"
   );
   setView(initial);
   window.setView = setView;
@@ -1969,8 +2331,40 @@ applyCountryCopy(getCountry());
 chimes.setCountry(getCountry().id);
 updateSideButtons();
 initCarousel();
+initGuide();
 initViews();
 bindAreaCopyLayout();
+bindAdminList();
+initWikiUi({
+  getSlug: () => currentGuideSlug || currentCountryId,
+  getView: () => document.getElementById("stage")?.dataset.view,
+  setView: (v) => window.setView?.(v),
+  getGuide,
+  countryOrder: COUNTRY_ORDER,
+  countries: COUNTRIES,
+  refreshAdmin: async () => {
+    await fetchPublishedArticles();
+    await renderAdminList();
+  },
+  refreshGuide: async () => {
+    const slug = currentGuideSlug || currentCountryId;
+    await fetchPublishedArticles();
+    await fetchArticle(slug);
+    if (document.getElementById("stage")?.dataset.view === "guide") {
+      renderGuide(slug);
+    }
+  }
+});
+
+(async function hydrateWiki() {
+  await Promise.all([hydrateSession(), fetchPublishedArticles()]);
+  const slug = currentGuideSlug || currentCountryId;
+  await fetchArticle(slug);
+  syncRoleChrome();
+  const view = document.getElementById("stage")?.dataset.view;
+  if (view === "guide") renderGuide(slug);
+  if (view === "admin") renderAdminList();
+})();
 
 document.getElementById("btnLeft")?.addEventListener("click", () => {
   const id = document.getElementById("btnLeft")?.dataset.country;

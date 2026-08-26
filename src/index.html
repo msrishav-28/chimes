@@ -3,7 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Budarina — China</title>
+    <title>Chimes — China</title>
+    <meta
+      name="description"
+      content="Hanging-cloth doorways into country roofs, with an architecture guide you can read, ask, and improve."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content="Chimes" />
+    <meta
+      property="og:description"
+      content="Hanging-cloth doorways into country roofs, with an architecture guide you can read, ask, and improve."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./roof-china.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,6 +26,7 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <a class="skip-link" href="#bottomCopy">Skip to copy</a>
     <div class="stage" id="stage" data-view="home">
       <header class="topbar">
         <div class="brand-nav">
@@ -27,6 +41,8 @@
             <a class="is-active" href="#home" data-view="home">Home</a>
             <span class="dot" aria-hidden="true"></span>
             <a href="#destinations" data-view="destinations">Destinations</a>
+            <span class="dot" aria-hidden="true"></span>
+            <a href="#guide" data-view="guide">Guide</a>
             <span class="dot" aria-hidden="true"></span>
             <a href="#contributions" data-view="contributions">Contributions</a>
           </nav>
@@ -100,8 +116,10 @@
             <div class="mobile-tabs" id="mobileTabs">
               <a href="#home" data-view="home" class="about-btn mobile-tab">Home</a>
               <a href="#destinations" data-view="destinations" class="about-btn mobile-tab">Destinations</a>
+              <a href="#guide" data-view="guide" class="about-btn mobile-tab">Guide</a>
               <a href="#contributions" data-view="contributions" class="about-btn mobile-tab">Contributions</a>
             </div>
+            <a href="#guide" data-view="guide" class="about-btn guide-entry">Read</a>
             <button type="button" class="about-btn" id="aboutBtn" aria-expanded="false" aria-controls="aboutModal">About</button>
           </div>
         </div>
@@ -179,6 +197,9 @@
               <button type="submit" class="contributions__submit" id="contributionsSubmit">
                 Add
               </button>
+              <button type="button" class="contributions__submit" id="writePageFromCloth">
+                Write a page
+              </button>
             </form>
             <p class="contributions__hint" id="contributionsHint" hidden></p>
           </div>
@@ -188,6 +209,23 @@
             </p>
             <div class="contributions__cloth" id="contributionsCloth" aria-hidden="true"></div>
           </div>
+        </div>
+      </section>
+
+      <section
+        class="guide"
+        id="guideView"
+        hidden
+        aria-label="Architecture guide"
+      >
+        <article class="guide__page" id="guidePage"></article>
+      </section>
+
+      <section class="admin" id="adminView" hidden aria-label="Admin inbox">
+        <div class="admin__inner">
+          <h2 class="admin__title">Inbox</h2>
+          <p class="admin__lead">Drafts wait here. Publish does not delete seed essays.</p>
+          <div id="adminList" class="admin__list"></div>
         </div>
       </section>
 
@@ -211,6 +249,89 @@
       </section>
     </div>
 
-    <script type="module" src="./script.js?v=contributions-8"></script>
+    <div class="wiki-sheet" id="askSheet" hidden aria-hidden="true" role="dialog" aria-labelledby="askTitle">
+      <button type="button" class="wiki-sheet__backdrop" data-wiki="close-sheet" aria-label="Close ask"></button>
+      <div class="wiki-sheet__panel">
+        <div class="wiki-sheet__bar">
+          <h2 class="wiki-sheet__title" id="askTitle">Ask the guide</h2>
+          <button type="button" class="about-btn" data-wiki="close-sheet">Close</button>
+        </div>
+        <div class="wiki-log" id="askLog"></div>
+        <form class="wiki-ask-form" id="askForm">
+          <label class="visually-hidden" for="askInput">Question</label>
+          <input class="wiki-input" id="askInput" name="question" maxlength="400" autocomplete="off" placeholder="A roof, a climate, a country" />
+          <button type="submit" class="about-btn">Ask</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="wiki-sheet" id="accountSheet" hidden aria-hidden="true" role="dialog" aria-labelledby="accountTitle">
+      <button type="button" class="wiki-sheet__backdrop" data-wiki="close-sheet" aria-label="Close account"></button>
+      <div class="wiki-sheet__panel">
+        <div class="wiki-sheet__bar">
+          <h2 class="wiki-sheet__title" id="accountTitle">Account</h2>
+          <button type="button" class="about-btn" data-wiki="close-sheet">Close</button>
+        </div>
+        <p class="wiki-sheet__hint">Role now: <span id="accountRoleLabel">visitor</span></p>
+        <form class="wiki-form" id="accountLoginForm">
+          <label class="wiki-label" for="accountEmail">Email</label>
+          <input class="wiki-input" id="accountEmail" type="email" autocomplete="username" />
+          <label class="wiki-label" for="accountPassword">Password</label>
+          <input class="wiki-input" id="accountPassword" type="password" autocomplete="current-password" />
+          <button type="submit" class="about-btn">Sign in</button>
+        </form>
+        <p class="wiki-status" id="accountLoginStatus" hidden></p>
+        <p class="wiki-sheet__hint" data-preview-roles>Preview roles are local only. The live inbox needs a real admin sign-in.</p>
+        <h3 class="wiki-sheet__sub">My drafts</h3>
+        <div id="accountDrafts" class="wiki-drafts"></div>
+        <div class="wiki-preview-roles" data-preview-roles>
+          <button type="button" class="about-btn" data-preview-role="visitor">Preview visitor</button>
+          <button type="button" class="about-btn" data-preview-role="contributor">Preview contributor</button>
+          <button type="button" class="about-btn" data-preview-role="admin">Preview admin</button>
+        </div>
+        <button type="button" class="about-btn" data-wiki="admin" data-admin-only hidden>Open inbox</button>
+        <button type="button" class="about-btn" id="accountLogout">Sign out</button>
+      </div>
+    </div>
+
+    <div class="wiki-sheet" id="contributeSheet" hidden aria-hidden="true" role="dialog" aria-labelledby="wikiContributeHeading">
+      <button type="button" class="wiki-sheet__backdrop" data-wiki="close-sheet" aria-label="Close contribute"></button>
+      <div class="wiki-sheet__panel">
+        <div class="wiki-sheet__bar">
+          <h2 class="wiki-sheet__title" id="wikiContributeHeading">Add a page</h2>
+          <button type="button" class="about-btn" data-wiki="close-sheet">Close</button>
+        </div>
+        <p class="wiki-sheet__hint" id="wikiContributeHint"></p>
+        <form class="wiki-form" id="wikiContributeForm">
+          <input type="hidden" id="wikiContributeType" value="page" />
+          <label class="wiki-label" for="wikiDisplayName">Your name (optional)</label>
+          <input class="wiki-input" id="wikiDisplayName" maxlength="80" autocomplete="nickname" />
+          <label class="wiki-label" for="wikiTitle">Title</label>
+          <input class="wiki-input" id="wikiTitle" maxlength="120" />
+          <label class="wiki-label" for="wikiTypology">Typology</label>
+          <input class="wiki-input" id="wikiTypology" maxlength="120" />
+          <label class="wiki-label" for="wikiSetting">Setting</label>
+          <input class="wiki-input" id="wikiSetting" maxlength="160" />
+          <label class="wiki-label" for="wikiLead">Lead</label>
+          <textarea class="wiki-input wiki-input--area" id="wikiLead" rows="3" maxlength="1200"></textarea>
+          <label class="wiki-label" for="wikiSectionHeading">Section heading</label>
+          <input class="wiki-input" id="wikiSectionHeading" maxlength="120" />
+          <label class="wiki-label" for="wikiSectionBody">Section</label>
+          <textarea class="wiki-input wiki-input--area" id="wikiSectionBody" rows="5" maxlength="4000"></textarea>
+          <label class="wiki-label" for="wikiSourceTitle">Source title</label>
+          <input class="wiki-input" id="wikiSourceTitle" maxlength="160" />
+          <label class="wiki-label" for="wikiSourceUrl">Source URL</label>
+          <input class="wiki-input" id="wikiSourceUrl" type="url" maxlength="400" />
+          <div id="wikiRoofRow">
+            <label class="wiki-label" for="wikiRoofFile">Roof image</label>
+            <input class="wiki-input" id="wikiRoofFile" type="file" accept="image/*" />
+          </div>
+          <button type="submit" class="about-btn">Queue for review</button>
+        </form>
+        <p class="wiki-status" id="wikiContributeStatus" hidden></p>
+      </div>
+    </div>
+
+    <script type="module" src="./script.js?v=wiki-2"></script>
   </body>
 </html>

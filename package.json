@@ -1,0 +1,20 @@
+{
+  "name": "chimes",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chimes living architecture wiki — Neon + Vercel API",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "migrate": "node scripts/migrate.mjs",
+    "test": "node --test tests/*.test.js",
+    "sync-static": "node scripts/sync-static.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "busboy": "^1.6.0"
+  }
+}

@@ -44,7 +44,9 @@ body {
   margin: 0;
   width: 100%;
   height: 100%;
+  min-height: 100dvh;
   overflow: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -56,10 +58,29 @@ body {
   -webkit-touch-callout: none;
 }
 
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  z-index: 20000;
+  padding: 8px 12px;
+  background: var(--ink-strong);
+  color: #f6ecda;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-decoration: none;
+  transform: translateY(-120%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .stage {
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: 100dvh;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
@@ -103,6 +124,7 @@ body {
 
 .menu {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
@@ -1179,6 +1201,510 @@ body {
   pointer-events: auto;
 }
 
+/* ─── Architecture guide (reading layer) ─── */
+.guide[hidden] {
+  display: none !important;
+}
+
+.stage[data-view="guide"] .area,
+.stage[data-view="guide"] .country-btn,
+.stage[data-view="guide"] .bottom-copy {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.stage[data-view="home"] .guide,
+.stage:not([data-view="guide"]) .guide {
+  display: none;
+}
+
+.guide {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  pointer-events: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.guide__page {
+  box-sizing: border-box;
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 96px var(--pad-x) 80px;
+  color: var(--ink-strong);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.guide__hero {
+  margin-bottom: 40px;
+  max-width: 65ch;
+}
+
+.guide__typology {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.guide__title {
+  margin: 0 0 10px;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: var(--ink-strong);
+}
+
+.guide__setting {
+  margin: 0 0 18px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: -0.06em;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.guide__lead {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: -0.06em;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.guide__index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide__index a {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: -0.06em;
+  line-height: 18px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.guide__index a:hover,
+.guide__index a:focus-visible {
+  color: var(--ink-strong);
+  text-decoration-color: var(--ink-strong);
+}
+
+.guide__index a.is-current {
+  font-weight: 500;
+  color: var(--ink-strong);
+  text-decoration-color: var(--ink-strong);
+}
+
+.guide__section {
+  margin: 0 0 36px;
+  overflow: hidden;
+}
+
+.guide__heading {
+  margin: 0 0 14px;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--ink-strong);
+}
+
+.guide__section p {
+  margin: 0 0 14px;
+  max-width: 65ch;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: -0.06em;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.guide__section p:last-child {
+  margin-bottom: 0;
+}
+
+.guide__figure {
+  width: min(46%, 340px);
+  margin: 4px 0 16px;
+}
+
+.guide__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  user-select: none;
+}
+
+.guide__figure figcaption {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: -0.06em;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.guide__figure--left {
+  float: left;
+  margin-right: 28px;
+}
+
+.guide__figure--right {
+  float: right;
+  margin-left: 28px;
+}
+
+.guide__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 18px;
+  margin: 8px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid rgba(88, 66, 60, 0.16);
+}
+
+.guide__related,
+.guide__home {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: -0.06em;
+  line-height: 21px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.guide__related:hover,
+.guide__home:hover,
+.guide__related:focus-visible,
+.guide__home:focus-visible {
+  color: var(--ink-strong);
+  text-decoration-thickness: 2px;
+  outline: none;
+}
+
+.guide__related:focus-visible,
+.guide__home:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.guide-entry {
+  display: inline;
+}
+
+.guide__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 18px 0 0;
+  align-items: baseline;
+}
+
+.guide__tools .about-btn {
+  pointer-events: auto;
+}
+
+.guide__search {
+  max-width: 280px;
+  margin-top: 16px;
+}
+
+.wiki-sheet__sub {
+  margin: 18px 0 8px;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.wiki-draft {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+}
+
+.wiki-sheet[hidden] {
+  display: none !important;
+}
+
+.wiki-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 13000;
+  display: grid;
+  place-items: end center;
+  pointer-events: auto;
+}
+
+.wiki-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: rgba(58, 45, 42, 0.28);
+}
+
+.wiki-sheet__panel {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 100%);
+  max-height: min(88dvh, 880px);
+  overflow: auto;
+  padding: 22px 22px 28px;
+  background: rgba(244, 234, 216, 0.97);
+  color: var(--ink-strong);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.wiki-sheet__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.wiki-sheet__title {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.wiki-sheet__hint,
+.wiki-status {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: -0.06em;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.wiki-form,
+.wiki-ask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.wiki-ask-form {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.wiki-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+}
+
+.wiki-input {
+  appearance: none;
+  border: none;
+  border-bottom: 1px solid rgba(88, 66, 60, 0.35);
+  border-radius: 0;
+  background: transparent;
+  padding: 8px 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: -0.06em;
+  color: var(--ink-strong);
+  width: 100%;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.wiki-input--area {
+  border: 1px solid rgba(88, 66, 60, 0.28);
+  padding: 8px;
+  min-height: 72px;
+  resize: vertical;
+}
+
+.wiki-input:focus {
+  outline: 1px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.wiki-log {
+  min-height: 120px;
+  max-height: 36vh;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: -0.06em;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.wiki-log__user {
+  color: var(--ink-muted);
+}
+
+.wiki-log__cite {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.wiki-preview-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 12px 0;
+}
+
+.admin[hidden] {
+  display: none !important;
+}
+
+.stage[data-view="admin"] .area,
+.stage[data-view="admin"] .country-btn,
+.stage[data-view="admin"] .bottom-copy {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.stage:not([data-view="admin"]) .admin {
+  display: none;
+}
+
+.admin {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: auto;
+}
+
+.admin__inner {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  padding: 96px var(--pad-x) 80px;
+  color: var(--ink-strong);
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.admin__title {
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.04em;
+}
+
+.admin__lead,
+.admin__empty {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+}
+
+.admin__row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(88, 66, 60, 0.16);
+}
+
+.admin__thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.admin__type,
+.admin__who,
+.admin__body {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: -0.06em;
+  color: var(--ink);
+}
+
+.admin__name {
+  margin: 4px 0;
+  font-family: var(--display);
+  font-size: 22px;
+  letter-spacing: -0.04em;
+}
+
+.admin__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiki-sheet,
+  .wiki-sheet__panel,
+  .scene,
+  .bottom-copy .eyebrow,
+  .bottom-copy .aside,
+  .heading h1 .char {
+    transition: none !important;
+    filter: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .guide__page {
+    padding: 80px var(--pad-x) 96px;
+  }
+
+  .guide__figure,
+  .guide__figure--left,
+  .guide__figure--right {
+    float: none;
+    width: min(100%, 360px);
+    margin: 0 0 16px;
+  }
+
+  .guide__title {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+}
+
 @media (max-width: 720px) {
   .contributions__inner {
     padding: 80px var(--pad-x) 28px;
@@ -1635,14 +2161,20 @@ body {
   .mobile-tabs {
     display: flex;
     gap: 10px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: baseline;
     white-space: nowrap;
   }
 
-  /* Keep bottom nav (tabs + About) on destinations/contributions */
+  .guide-entry {
+    display: none;
+  }
+
+  /* Keep bottom nav (tabs + About) on destinations/contributions/guide */
   .stage[data-view="destinations"] .bottom-copy,
-  .stage[data-view="contributions"] .bottom-copy {
+  .stage[data-view="contributions"] .bottom-copy,
+  .stage[data-view="guide"] .bottom-copy,
+  .stage[data-view="admin"] .bottom-copy {
     opacity: 1;
     visibility: visible;
     pointer-events: none;
@@ -1651,13 +2183,36 @@ body {
   .stage[data-view="destinations"] .heading,
   .stage[data-view="destinations"] .aside,
   .stage[data-view="contributions"] .heading,
-  .stage[data-view="contributions"] .aside {
+  .stage[data-view="contributions"] .aside,
+  .stage[data-view="guide"] .heading,
+  .stage[data-view="guide"] .aside,
+  .stage[data-view="admin"] .heading,
+  .stage[data-view="admin"] .aside {
     display: none;
   }
 
   .stage[data-view="destinations"] .aside-actions,
-  .stage[data-view="contributions"] .aside-actions {
+  .stage[data-view="contributions"] .aside-actions,
+  .stage[data-view="guide"] .aside-actions,
+  .stage[data-view="admin"] .aside-actions {
     pointer-events: auto;
+  }
+
+  .stage[data-view="guide"] .guide,
+  .stage[data-view="admin"] .admin {
+    bottom: 72px;
+  }
+
+  .admin__row {
+    grid-template-columns: 1fr;
+  }
+
+  .wiki-sheet {
+    place-items: end stretch;
+  }
+
+  .wiki-sheet__panel {
+    width: 100%;
   }
 
   .chat-btn {

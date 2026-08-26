@@ -6,3 +6,5 @@ node_modules/
 .env
 .ENV
 *.pem
+.env.local
+.env*.local
