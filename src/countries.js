@@ -2,12 +2,22 @@
  * Country destinations — each roof / cloth / writing / page copy.
  * Side buttons cycle neighbors along COUNTRY_ORDER.
  */
+import { siteSrc } from "./cloudinary-site.js";
+
+function roofOf(id) {
+  return siteSrc(`./roof-${id}.png`, { width: 1400 });
+}
+
+function selectorOf(id) {
+  return siteSrc(`./selector-${id}.png`, { width: 200 });
+}
+
 export const COUNTRIES = {
   vietnam: {
     id: "vietnam",
     name: "Vietnam",
-    roof: "./roof-vietnam.png",
-    buttonIcon: "./selector-vietnam.png",
+    roof: roofOf("vietnam"),
+    buttonIcon: selectorOf("vietnam"),
     writing: "vertical",
     gridW: 62,
     eyebrowNative: "Duyên",
@@ -40,8 +50,8 @@ export const COUNTRIES = {
   china: {
     id: "china",
     name: "China",
-    roof: "./roof-china.png",
-    buttonIcon: "./selector-china.png",
+    roof: roofOf("china"),
+    buttonIcon: selectorOf("china"),
     writing: "vertical",
     eyebrowNative: "缘分",
     eyebrowRoman: "Yuánfèn",
@@ -73,8 +83,8 @@ export const COUNTRIES = {
   japan: {
     id: "japan",
     name: "Japan",
-    roof: "./roof-japan.png",
-    buttonIcon: "./selector-japan.png",
+    roof: roofOf("japan"),
+    buttonIcon: selectorOf("japan"),
     writing: "vertical",
     eyebrowNative: "一期一会",
     eyebrowRoman: "Ichigo ichie",
@@ -107,8 +117,8 @@ export const COUNTRIES = {
   kazakhstan: {
     id: "kazakhstan",
     name: "Kazakhstan",
-    roof: "./roof-kazakhstan.png",
-    buttonIcon: "./selector-kazakhstan.png",
+    roof: roofOf("kazakhstan"),
+    buttonIcon: selectorOf("kazakhstan"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -143,8 +153,8 @@ export const COUNTRIES = {
   russia: {
     id: "russia",
     name: "Russia",
-    roof: "./roof-russia.png",
-    buttonIcon: "./selector-russia.png",
+    roof: roofOf("russia"),
+    buttonIcon: selectorOf("russia"),
     writing: "horizontal",
     gridW: 40,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -179,8 +189,8 @@ export const COUNTRIES = {
   france: {
     id: "france",
     name: "France",
-    roof: "./roof-france.png",
-    buttonIcon: "./selector-france.png",
+    roof: roofOf("france"),
+    buttonIcon: selectorOf("france"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -215,8 +225,8 @@ export const COUNTRIES = {
   india: {
     id: "india",
     name: "India",
-    roof: "./roof-india.png",
-    buttonIcon: "./selector-india.png",
+    roof: roofOf("india"),
+    buttonIcon: selectorOf("india"),
     writing: "horizontal",
     gridW: 40,
     font: '"JetBrains Mono", "Noto Sans Devanagari", "Kohinoor Devanagari", "Noto Serif Devanagari", "PT Serif", serif',
@@ -251,8 +261,8 @@ export const COUNTRIES = {
   uk: {
     id: "uk",
     name: "UK",
-    roof: "./roof-uk.png",
-    buttonIcon: "./selector-uk.png",
+    roof: roofOf("uk"),
+    buttonIcon: selectorOf("uk"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -287,8 +297,8 @@ export const COUNTRIES = {
   norway: {
     id: "norway",
     name: "Norway",
-    roof: "./roof-norway.png",
-    buttonIcon: "./selector-norway.png",
+    roof: roofOf("norway"),
+    buttonIcon: selectorOf("norway"),
     writing: "horizontal",
     gridW: 40,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -323,8 +333,8 @@ export const COUNTRIES = {
   italy: {
     id: "italy",
     name: "Italy",
-    roof: "./roof-italy.png",
-    buttonIcon: "./selector-italy.png",
+    roof: roofOf("italy"),
+    buttonIcon: selectorOf("italy"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -359,8 +369,8 @@ export const COUNTRIES = {
   usa: {
     id: "usa",
     name: "USA",
-    roof: "./roof-usa.png",
-    buttonIcon: "./selector-usa.png",
+    roof: roofOf("usa"),
+    buttonIcon: selectorOf("usa"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -395,8 +405,8 @@ export const COUNTRIES = {
   brazil: {
     id: "brazil",
     name: "Brazil",
-    roof: "./roof-brazil.png",
-    buttonIcon: "./selector-brazil.png",
+    roof: roofOf("brazil"),
+    buttonIcon: selectorOf("brazil"),
     writing: "horizontal",
     gridW: 42,
     font: '"JetBrains Mono", "PT Serif", "Georgia", "Times New Roman", serif',
@@ -431,8 +441,8 @@ export const COUNTRIES = {
   iran: {
     id: "iran",
     name: "Iran",
-    roof: "./roof-iran.png",
-    buttonIcon: "./selector-iran.png",
+    roof: roofOf("iran"),
+    buttonIcon: selectorOf("iran"),
     writing: "horizontal",
     gridW: 40,
     font: '"JetBrains Mono", "Noto Naskh Arabic", "Noto Sans Arabic", "Geeza Pro", "PT Serif", serif',

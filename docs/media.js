@@ -1,9 +1,15 @@
 /**
  * Cloudinary delivery: keep originals in the account, send a sized copy.
- * Local project paths are left unchanged until those assets are migrated.
+ * Official site paths go through siteSrc() (local until upload-site-images).
  */
 
+import { siteSrc } from "./cloudinary-site.js";
+
 const CLOUDINARY_HOST = /res\.cloudinary\.com/i;
+
+function siteFallback(src, width) {
+  return siteSrc(src, { width });
+}
 
 export function figureWidth() {
   if (typeof window === "undefined") return 1200;
@@ -13,7 +19,12 @@ export function figureWidth() {
 export function deliverySrc(url, width = figureWidth()) {
   const src = String(url || "");
   if (!src || src.startsWith("blob:") || src.startsWith("data:")) return src;
-  if (!CLOUDINARY_HOST.test(src)) return src;
+  if (!CLOUDINARY_HOST.test(src)) {
+    if (src.startsWith("./") || /^[\w.-]+\.(png|jpe?g|webp|svg)$/i.test(src)) {
+      return siteFallback(src, width);
+    }
+    return src;
+  }
   if (/\/image\/upload\/.*\/v\d+\//.test(src) || /\/image\/upload\/w_/.test(src)) {
     return src;
   }

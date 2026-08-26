@@ -10,7 +10,12 @@ const FILES = [
   "script.js",
   "index.html",
   "media.js",
-  "favicon.svg"
+  "favicon.svg",
+  "cloudinary-site.js",
+  "site-cloud.js",
+  "countries.js",
+  "guides.js",
+  "style.css"
 ];
 
 async function main() {

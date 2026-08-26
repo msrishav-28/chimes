@@ -10,6 +10,7 @@ import {
 import { chimes } from "./chimes.js";
 import { getGuide } from "./guides.js";
 import { deliverySrc } from "./media.js";
+import { applySiteCssVars, applySiteDomImages, siteSrc } from "./cloudinary-site.js";
 import {
   communityFromPending,
   fetchArticle,
@@ -26,6 +27,9 @@ import {
   closeWikiSheets,
   syncRoleChrome
 } from "./wiki-ui.js";
+
+applySiteCssVars();
+applySiteDomImages();
 
 /* Loaded on demand so a missing/broken contributions.js cannot kill About + home. */
 let contribApi = null;
@@ -2051,10 +2055,10 @@ function initCarousel() {
     el.innerHTML = `
       <div class="carousel__area">
         <div class="shadow" aria-hidden="true">
-          <img class="shadow__layer shadow__layer--sharp" src="./shadow.svg" alt="" />
-          <img class="shadow__layer shadow__layer--soft" src="./shadow.svg" alt="" />
-          <img class="shadow__layer shadow__layer--softer" src="./shadow.svg" alt="" />
-          <img class="shadow__layer shadow__layer--softest" src="./shadow.svg" alt="" />
+          <img class="shadow__layer shadow__layer--sharp" src="${siteSrc("./shadow.svg")}" alt="" />
+          <img class="shadow__layer shadow__layer--soft" src="${siteSrc("./shadow.svg")}" alt="" />
+          <img class="shadow__layer shadow__layer--softer" src="${siteSrc("./shadow.svg")}" alt="" />
+          <img class="shadow__layer shadow__layer--softest" src="${siteSrc("./shadow.svg")}" alt="" />
         </div>
         <div class="strings carousel__strings" aria-hidden="true"></div>
         <div class="roof" aria-hidden="true">

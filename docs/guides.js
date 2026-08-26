@@ -3,6 +3,8 @@
  * Types and construction notes, not monument IDs for the drawings.
  */
 
+import { siteSrc } from "./cloudinary-site.js";
+
 export const GUIDES = {
   vietnam: {
     typology: "Temple and dinh roofs",
@@ -14,7 +16,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-vietnam.png",
+          src: siteSrc("./roof-vietnam.png", { width: 1200 }),
           alt: "Curved Vietnamese temple roof with stacked tiles and lifted corners",
           caption: "Stacked ngói and a corner that turns up instead of dying into a box."
         },
@@ -27,7 +29,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-vietnam.png",
+          src: siteSrc("./selector-vietnam.png", { width: 480 }),
           alt: "Detail of a Vietnamese roof ridge and tile course",
           caption: "A short reading of the ridge: ornament sitting on a working tile coat."
         },
@@ -57,7 +59,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-china.png",
+          src: siteSrc("./roof-china.png", { width: 1200 }),
           alt: "Chinese palace-style roof with flying corner eaves and ornamental ridge",
           caption: "A concave slope and a corner that leaves the wall behind."
         },
@@ -70,7 +72,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-china.png",
+          src: siteSrc("./selector-china.png", { width: 480 }),
           alt: "Detail of Chinese roof tiles and lifted eave corner",
           caption: "Tile as a coat of scales. The corner is where the coat has to turn."
         },
@@ -100,7 +102,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-japan.png",
+          src: siteSrc("./roof-japan.png", { width: 1200 }),
           alt: "Japanese temple roof with broad eaves and tiled slopes",
           caption: "A wide hat. The wall is allowed to be a shadow."
         },
@@ -113,7 +115,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-japan.png",
+          src: siteSrc("./selector-japan.png", { width: 480 }),
           alt: "Detail of Japanese tiled roof and eave edge",
           caption: "Kawara at the drip edge. Water is asked to leave cleanly."
         },
@@ -143,7 +145,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-kazakhstan.png",
+          src: siteSrc("./roof-kazakhstan.png", { width: 1200 }),
           alt: "Yurt roof with felt cover and open shanyrak crown",
           caption: "A low dome of poles. The eye of the house is the hole at the top."
         },
@@ -156,7 +158,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-kazakhstan.png",
+          src: siteSrc("./selector-kazakhstan.png", { width: 480 }),
           alt: "Detail of a yurt crown and felt roof",
           caption: "Shanyrak logic: a ring that is structure, window, and memory."
         },
@@ -186,7 +188,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-russia.png",
+          src: siteSrc("./roof-russia.png", { width: 1200 }),
           alt: "Painted Russian terem roof with stacked gables and carved edges",
           caption: "Gables as headdresses. The roof is a second façade."
         },
@@ -199,7 +201,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-russia.png",
+          src: siteSrc("./selector-russia.png", { width: 480 }),
           alt: "Detail of Russian wooden roof ornament and ridge",
           caption: "Carving at the drip. Decoration living where water runs."
         },
@@ -229,7 +231,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-france.png",
+          src: siteSrc("./roof-france.png", { width: 1200 }),
           alt: "French mansard roof with steep lower slope, dormers, and iron cresting",
           caption: "Two pitches. The lower one is a wall in disguise."
         },
@@ -242,7 +244,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-france.png",
+          src: siteSrc("./selector-france.png", { width: 480 }),
           alt: "Detail of mansard dormers and zinc or slate roof",
           caption: "Dormers as little houses. They are how the attic joins the street."
         },
@@ -272,7 +274,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-india.png",
+          src: siteSrc("./roof-india.png", { width: 1200 }),
           alt: "Bulbous dome with corner chhatri pavilions",
           caption: "A dome as a sky room. Chhatris as smaller skies at the corners."
         },
@@ -285,7 +287,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-india.png",
+          src: siteSrc("./selector-india.png", { width: 480 }),
           alt: "Detail of an Indian dome and chhatri roof",
           caption: "Drum, dome, finial. The profile is a piece of climate equipment."
         },
@@ -315,7 +317,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-uk.png",
+          src: siteSrc("./roof-uk.png", { width: 1200 }),
           alt: "Thatched roof with deep rounded eaves and a patterned ridge",
           caption: "A coat of reed. Windows sit back under a brow."
         },
@@ -328,7 +330,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-uk.png",
+          src: siteSrc("./selector-uk.png", { width: 480 }),
           alt: "Detail of thatch texture and eave",
           caption: "Combed courses. Water is asked to run on the surface, not in."
         },
@@ -358,7 +360,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-norway.png",
+          src: siteSrc("./roof-norway.png", { width: 1200 }),
           alt: "Turf roof with grass growing on a timber house",
           caption: "The ridge is a seam in a field. The eave is a cut bank."
         },
@@ -371,7 +373,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-norway.png",
+          src: siteSrc("./selector-norway.png", { width: 480 }),
           alt: "Detail of a sod roof edge and grass cover",
           caption: "Bark for water. Earth for weight. Grass as a side effect that became the image."
         },
@@ -401,7 +403,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-italy.png",
+          src: siteSrc("./roof-italy.png", { width: 1200 }),
           alt: "Italian cupola with lantern above terracotta tiled roofs",
           caption: "A lantern on a dome. The town keeps a candle on its skyline."
         },
@@ -414,7 +416,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-italy.png",
+          src: siteSrc("./selector-italy.png", { width: 480 }),
           alt: "Detail of an Italian dome lantern and tiled roof",
           caption: "The lantern ventilates and finishes the dome. It is not only a statue’s stand."
         },
@@ -444,7 +446,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-usa.png",
+          src: siteSrc("./roof-usa.png", { width: 1200 }),
           alt: "Wood shingle gable roof on a timber house",
           caption: "A triangle with a porch implicit. The gable is the face."
         },
@@ -457,7 +459,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-usa.png",
+          src: siteSrc("./selector-usa.png", { width: 480 }),
           alt: "Detail of wood shingles on a gable roof",
           caption: "Overlapping units. Each shingle is a small, replaceable eave."
         },
@@ -487,7 +489,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "left",
-          src: "./roof-brazil.png",
+          src: siteSrc("./roof-brazil.png", { width: 1200 }),
           alt: "Terracotta tiled Brazilian colonial roof with white walls",
           caption: "Clay scales over a white box. Heat hits the tile, not the room."
         },
@@ -500,7 +502,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "right",
-          src: "./selector-brazil.png",
+          src: siteSrc("./selector-brazil.png", { width: 480 }),
           alt: "Detail of terracotta roof tiles",
           caption: "Pan and cover. Wind and rain have to climb the corrugation."
         },
@@ -530,7 +532,7 @@ export const GUIDES = {
         heading: "Form",
         figure: {
           side: "right",
-          src: "./roof-iran.png",
+          src: siteSrc("./roof-iran.png", { width: 1200 }),
           alt: "Iranian courtyard roofs with badgir windcatcher towers",
           caption: "Towers as lungs. The skyline is a climate diagram."
         },
@@ -543,7 +545,7 @@ export const GUIDES = {
         heading: "How it is built",
         figure: {
           side: "left",
-          src: "./selector-iran.png",
+          src: siteSrc("./selector-iran.png", { width: 480 }),
           alt: "Detail of windcatcher towers on a desert roof",
           caption: "Openings with a direction. A tower that is useless if it faces the wrong wind."
         },

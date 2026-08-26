@@ -1,6 +1,6 @@
 # Chimes living architecture wiki — master plan
 
-Last updated: 2026-08-26 (ops studio production pass).
+Last updated: 2026-08-26 (ops studio Cloudinary media pass).
 
 **Sync status:** product UI + Neon API + ops floor **are in the repo** (import fixes, `/api/health`, CI, HSTS/CSP, preview-role hide). The **living wiki is not public** until someone with the accounts fills Neon / Cloudinary / Vercel env, runs migrate, and deploys. Preview of the curtain + seed Guide can run without that.
 
@@ -46,7 +46,7 @@ A hanging-cloth doorway into countries, with a growing architecture-and-history 
 5. Wikipedia's job (public writing, history, growth), not its furniture.
 6. Crawlers file **pending drafts** only. Humans publish.
 7. **Neon**, not Firebase.
-8. **Cloudinary** for user roofs. Originals stored. Delivery resized (`w_*,c_limit,f_auto,q_auto`). Do not send 5MB originals to phones.
+8. **Cloudinary** for official site pictures (`chimes/site`) and user roofs (`chimes/drafts`, `chimes/roofs`). Originals stored. Delivery resized (`w_*,c_limit,f_auto,q_auto`). Do not send 5MB originals to phones. Do not delete git originals until the owner says so.
 9. Roles: visitor may suggest; contributor may upload; admin publishes. Preview roles in the Account sheet are **local only** and are not security.
 10. Community articles appear in the **Guide index**, not in Destinations (Destinations needs roof art we have).
 11. Secrets never in the browser.
@@ -168,7 +168,7 @@ Backend:
 
 Media:
 
-- Upload Marina's `bg.png` / `roof-*.png` to Cloudinary and point Home/Destinations at `deliverySrc` URLs. Do not overwrite originals in git until the owner says so.
+- Official site catalog and `npm run upload-site-images` shipped 2026-08-26. Git originals stay. Live upload still needs Cloudinary keys in `.env`.
 
 ### DEFERRED — parked on purpose
 
@@ -226,7 +226,7 @@ cd dist && python3 -m http.server 8765
 
 `npm run sync-static` copies selected `src/` files to `dist/` and `docs/`.
 
-**Comment (ops):** `docs/` is still a site clone for now. Retiring it as GitHub Pages is optional later.
+**Comment (ops):** `docs/` is still a site clone for now. Retiring it as GitHub Pages is optional later. Developer how-to lives in `handbook/`, not in `docs/`. Root `README.md` is the product brief.
 
 ---
 

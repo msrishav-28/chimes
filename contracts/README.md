@@ -2,12 +2,12 @@
 
 `/api/*` is implemented in this repo (Vercel + Neon). If the API is down, the UI still queues work in `localStorage` (`chimes-pending`) and answers Ask from seed essays.
 
-See `plan.md` for product rules. Seed essays in `src/guides.js` are never deleted.
+See `plan.md` for product rules. Seed essays in `src/guides.js` are never deleted. Product story: root `README.md`. How to run and ship: `handbook/`.
 
 ## Stack
 
 - Neon Postgres (use the pooled connection string on Vercel)
-- Cloudinary signed upload, folders `chimes/roofs` and `chimes/drafts`
+- Cloudinary: official site `chimes/site`; user uploads `chimes/roofs` (admin) and `chimes/drafts` (contributor)
 - Resize on delivery: `w_{n},c_limit,f_auto,q_auto`
 - HttpOnly `chimes_session` cookie
 - Errors: `{ error: { code, message }, requestId }`
@@ -47,6 +47,7 @@ Writes need `Origin` or `Referer` matching `CHIMES_ORIGIN` (or the current host)
 ## Frontend helpers
 
 - `src/wiki-merge.js` — seed append rule, shared with the API
-- `src/media.js` — `deliverySrc(url, width)`
+- `src/media.js` — `deliverySrc(url, width)` for API / Cloudinary URLs
+- `src/cloudinary-site.js` — official site catalog and `siteSrc()`
 - `src/wiki-api.js` — client + local fallback
 - `src/wiki-ui.js` — sheets and admin list

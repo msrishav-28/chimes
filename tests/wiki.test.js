@@ -143,3 +143,13 @@ describe("launch-blocking imports", () => {
     assert.doesNotMatch(src, /leafId/);
   });
 });
+
+describe("site Cloudinary catalog", () => {
+  it("keeps local paths until a cloud name is set", async () => {
+    const { siteSrc, sitePublicId, SITE_FILES } = await import("../src/cloudinary-site.js");
+    assert.ok(SITE_FILES.includes("bg.png"));
+    assert.ok(SITE_FILES.includes("roof-china.png"));
+    assert.equal(sitePublicId("./roof-china.png"), "chimes/site/roof-china");
+    assert.equal(siteSrc("./roof-china.png", { width: 1400 }), "./roof-china.png");
+  });
+});

@@ -1,35 +1,12 @@
 import { readdir, readFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import { hashPassword } from "../api/lib/password.js";
 import { splitSqlStatements } from "../api/lib/sql-split.js";
+import { envRoot, loadEnvFile } from "./load-env.mjs";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT = envRoot();
 const MIGRATIONS = join(ROOT, "db", "migrations");
-
-function loadEnvFile() {
-  const path = join(ROOT, ".env");
-  return readFile(path, "utf8")
-    .then((text) => {
-      for (const line of text.split(/\r?\n/)) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith("#")) continue;
-        const i = trimmed.indexOf("=");
-        if (i === -1) continue;
-        const key = trimmed.slice(0, i).trim();
-        let value = trimmed.slice(i + 1).trim();
-        if (
-          (value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))
-        ) {
-          value = value.slice(1, -1);
-        }
-        if (!process.env[key]) process.env[key] = value;
-      }
-    })
-    .catch(() => {});
-}
 
 async function ensureAdmin(sql) {
   const email = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
