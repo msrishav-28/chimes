@@ -15,7 +15,7 @@
     "upload-site-images": "node scripts/upload-site-images.mjs"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
+    "@neondatabase/serverless": "^1.2.0",
     "busboy": "^1.6.0"
   }
 }
